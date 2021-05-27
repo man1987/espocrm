@@ -27,12 +27,27 @@
  * these Appropriate Legal Notices must retain the display of the "EspoCRM" word.
  ************************************************************************/
 
-namespace Espo\Modules\Crm\Services;
+namespace Espo\Modules\Crm\Classes\DuplicateWhereBuilders;
 
-class Account extends \Espo\Services\Record
+use Espo\Core\Record\Duplicate\WhereBuilder;
+
+use Espo\ORM\{
+    QueryParams\Parts\Condition as Cond,
+    QueryParams\Parts\WhereItem,
+    Entity,
+};
+
+class Account implements WhereBuilder
 {
-    protected $linkMandatorySelectAttributeList = [
-        'contacts' => ['accountIsInactive'],
-        'targetLists' => ['isOptedOut'],
-    ];
+    public function build(Entity $entity): ?WhereItem
+    {
+        if (!$entity->get('name')) {
+            return null;
+        }
+
+        return Cond::equal(
+            Cond::column('name'),
+            $entity->get('name')
+        );
+    }
 }
